@@ -1,0 +1,36 @@
+name: Node.jsfile
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: google
+
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]  # Test op meerdere Node.js-versies
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'  # Cache npm dependencies voor snellere builds
+
+      - name: Install dependencies
+        run: npm ci  # Gebruik 'ci' voor consistente dependency-installatie
+
+      - name: Run tests
+        run: npm test
+
+      - name: Lint code
+        run: npm run lint || echo "Linting faalde, maar build gaat verder"
